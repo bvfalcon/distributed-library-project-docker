@@ -1,0 +1,44 @@
+version: "3.5"
+
+services:
+
+  db:
+    image: mysql:8.0.23
+    container_name: db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    volumes:
+      - ./db:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/1.sql
+
+  app-server:
+    container_name: dlp-server
+    build:
+      context: .
+      args:
+        WILDFLY_ADMIN_PASSWORD: ${WILDFLY_ADMIN_PASSWORD}
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "9990:9990"
+    restart: always
+    command: /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_PASSWORD: ${DB_PASSWORD}
+      DLP_SALT: ${DLP_SALT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+    volumes:
+      - ./wildfly-22.0.1.Final/standalone/configuration/standalone.xml:/opt/jboss/wildfly/standalone/configuration/standalone.xml
+    depends_on:
+      - db
+    links:
+      - db
