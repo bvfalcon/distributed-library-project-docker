@@ -1,10 +1,10 @@
-FROM jboss/wildfly:22.0.1.Final
+FROM jboss/wildfly:25.0.1.Final
 
 ARG WILDFLY_ADMIN_PASSWORD
 
 COPY ./dlp.war /opt/jboss/wildfly/standalone/deployments/dlp.war
 
-COPY ./wildfly-22.0.1.Final/modules/system/layers/base /opt/jboss/wildfly/modules/system/layers/base
+COPY ./wildfly-25.0.1.Final/modules/system/layers/base /opt/jboss/wildfly/modules/system/layers/base
 
 RUN /opt/jboss/wildfly/bin/add-user.sh admin Admin#$WILDFLY_ADMIN_PASSWORD --silent
 
